@@ -1192,6 +1192,7 @@ impl Client {
                 },
                 use_default_consistency: options.use_default_consistency,
                 expr_template_values: options.expr_template_values.clone(),
+                namespace: Some("".to_string()),
             })
             .await?
             .into_inner();
@@ -1315,6 +1316,7 @@ impl Client {
                 expr_template_values: options.expr_template_values.clone(),
                 sub_reqs: vec![],
                 function_score: None,
+                namespace: Some("".to_string()),
             })
             .await?
             .into_inner();
@@ -1514,6 +1516,7 @@ impl Client {
                 sub_reqs: vec![],
                 expr_template_values: req.expr_params.unwrap_or_default(),
                 function_score: None,
+                namespace: Some("".to_string()),
             };
 
             search_requests.push(search_request);
@@ -1547,6 +1550,7 @@ impl Client {
             .parse()
             .unwrap_or(true),
             function_score: None,
+            namespace: Some("".to_string()),
         };
 
         let res = self

@@ -100,6 +100,7 @@ impl Client {
                 fields_data: fields_data.into_iter().map(|f| f.into()).collect(),
                 hash_keys: Vec::new(),
                 schema_timestamp: 0,
+                namespace: Some("".to_string()),
             })
             .await?
             .into_inner();
@@ -214,6 +215,7 @@ impl Client {
                 hash_keys: Vec::new(),
                 schema_timestamp: 0,
                 partial_update: false,
+                namespace: Some("".to_string()),
             })
             .await?
             .into_inner();

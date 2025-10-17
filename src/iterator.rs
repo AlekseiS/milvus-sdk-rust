@@ -557,6 +557,7 @@ impl QueryIterator {
                 consistency_level: self.options.consistency_level.unwrap_or(0),
                 use_default_consistency: self.options.consistency_level.is_none(),
                 expr_template_values: self.options.expr_template_values.clone(),
+                namespace: Some("".to_string()),
             })
             .await?
             .into_inner();
@@ -711,6 +712,7 @@ impl QueryIterator {
                 consistency_level: self.options.consistency_level.unwrap_or(0),
                 use_default_consistency: self.options.consistency_level.is_none(),
                 expr_template_values: self.options.expr_template_values.clone(),
+                namespace: Some("".to_string()),
             })
             .await?
             .into_inner();
@@ -954,6 +956,7 @@ impl QueryIterator {
                     consistency_level: self.options.consistency_level.unwrap_or(0),
                     use_default_consistency: self.options.consistency_level.is_none(),
                     expr_template_values: self.options.expr_template_values.clone(),
+                    namespace: Some("".to_string()),
                 })
                 .await?
                 .into_inner();
@@ -1395,6 +1398,7 @@ impl SearchIterator {
                 expr_template_values: self.options.expr_template_values.clone(),
                 sub_reqs: vec![],
                 function_score: None,
+                namespace: Some("".to_string()),
             })
             .await?
             .into_inner();

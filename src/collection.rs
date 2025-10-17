@@ -728,6 +728,7 @@ impl Client {
                 partition_id: 0,
                 segment_ids: vec![],
                 channel: "".to_string(),
+                l0_compaction: false,
             })
             .await?
             .into_inner();
