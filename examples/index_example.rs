@@ -34,13 +34,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     client.create_collection(schema.clone(), None).await?;
 
     println!("Start inserting entities");
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let mut embeddings_data = Vec::new();
     let mut title_data = Vec::new();
 
     for i in 1..=6 {
-        embeddings_data.extend((0..DIM).map(|_| rng.r#gen::<f32>()));
+        embeddings_data.extend((0..DIM).map(|_| rng.random::<f32>()));
         title_data.push(format!("t{}", i));
     }
 

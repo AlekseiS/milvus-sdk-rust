@@ -15,7 +15,7 @@ use milvus::{
     schema::{CollectionSchemaBuilder, FieldSchema},
     value::{Value, ValueVec},
 };
-use rand::seq::SliceRandom;
+use rand::prelude::IndexedRandom;
 use rand::Rng;
 use std::{
     borrow::Cow,
@@ -75,7 +75,7 @@ async fn high_concurrency_crud_and_indexing() -> Result<()> {
                 let start_id = (i as i64 * TOTAL_INSERTS_PER_TASK) + (j * BATCH_SIZE);
                 let ids: Vec<i64> = (start_id..start_id + BATCH_SIZE).collect();
                 let vectors: Vec<f32> = (0..(BATCH_SIZE * DEFAULT_DIM))
-                    .map(|_| rand::thread_rng().r#gen())
+                    .map(|_| rand::rng().random())
                     .collect();
                 let varchars: Vec<String> = (0..BATCH_SIZE)
                     .map(|k| format!("varchar_{}", start_id + k))
@@ -113,7 +113,7 @@ async fn high_concurrency_crud_and_indexing() -> Result<()> {
         delete_tasks.push(tokio::spawn(async move {
             let ids_to_delete = {
                 let mut guard = inserted_ids_clone.lock().unwrap();
-                let mut rng = rand::thread_rng();
+                let mut rng = rand::rng();
                 let sample: Vec<i64> = guard
                     .choose_multiple(&mut rng, DELETE_BATCH_SIZE)
                     .cloned()

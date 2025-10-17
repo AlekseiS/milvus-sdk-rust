@@ -85,10 +85,11 @@ pub async fn create_test_collection_custom(
 }
 
 pub fn gen_random_name() -> String {
+    use rand::Rng;
     format!(
         "r{}",
-        rand::thread_rng()
-            .sample_iter(&rand::distributions::Alphanumeric)
+        rand::rng()
+            .sample_iter(rand::distr::Alphanumeric)
             .take(7)
             .map(char::from)
             .collect::<String>(),
@@ -97,9 +98,9 @@ pub fn gen_random_name() -> String {
 
 pub fn gen_random_int64_vector(n: i64) -> Vec<i64> {
     let mut data: Vec<i64> = Vec::with_capacity(n as usize);
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     for _ in 0..n {
-        data.push(rng.r#gen());
+        data.push(rng.random());
     }
     data
 }
@@ -110,9 +111,9 @@ pub fn gen_random_f32_vector(n: i64) -> Vec<f32> {
 
 pub fn gen_random_f32_vector_custom(n: i64, dimension: i64) -> Vec<f32> {
     let mut data = Vec::<f32>::with_capacity((n * dimension) as usize);
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     for _ in 0..n * dimension {
-        data.push(rng.r#gen());
+        data.push(rng.random());
     }
     data
 }

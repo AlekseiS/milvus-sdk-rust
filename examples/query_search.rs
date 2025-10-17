@@ -58,7 +58,7 @@ async fn query_test(client: &Client) -> Result<()> {
 async fn search_test(client: &Client) -> Result<()> {
     let vector_to_search = Value::from(
         (0..DIM as usize)
-            .map(|_| rand::thread_rng().gen_range(0.0..1.0))
+            .map(|_| rand::rng().random_range(0.0..1.0))
             .collect::<Vec<f32>>(),
     );
     println!("==========Search test begin==========");
@@ -131,7 +131,7 @@ async fn prepare_data(client: &Client) -> Result<()> {
         .collect::<Vec<_>>();
     let deposit = (0..NUM_ENTITIES).map(|i| i as f64).collect::<Vec<_>>();
     let picture = (0..NUM_ENTITIES * DIM as usize)
-        .map(|_| rand::thread_rng().gen_range(0.0..1.0))
+        .map(|_| rand::rng().random_range(0.0..1.0))
         .collect::<Vec<f32>>();
 
     let id_column = FieldColumn::new(schema.get_field(USER_ID).unwrap(), ids);
