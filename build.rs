@@ -2,7 +2,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     tonic_build::configure()
         .build_server(false)
         .out_dir("src/proto")
-        .compile(
+        .compile_protos(
             &[
                 "milvus-proto/proto/common.proto",
                 "milvus-proto/proto/milvus.proto",
