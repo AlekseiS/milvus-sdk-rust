@@ -17,3 +17,6 @@ Cargo.lock
 /target
 #Cargo.lock
 /.idea/
+
+# Docker volumes - contains runtime data from Milvus/MinIO
+/volumes/

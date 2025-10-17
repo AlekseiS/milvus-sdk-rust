@@ -527,7 +527,9 @@ impl Client {
         };
 
         let new_client =
-            MilvusServiceClient::with_interceptor(self.channel.clone(), combined_interceptor);
+            MilvusServiceClient::with_interceptor(self.channel.clone(), combined_interceptor)
+                .max_decoding_message_size(256 * 1024 * 1024) // 256MB
+                .max_encoding_message_size(256 * 1024 * 1024); // 256MB
         self.client = new_client.clone();
         self.collection_cache = CollectionCache::new(new_client);
 

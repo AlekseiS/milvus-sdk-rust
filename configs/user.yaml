@@ -17,3 +17,11 @@ quotaAndLimits:
       enabled: false
   flushRate:
     enabled: false
+
+# Increase gRPC message size limits for testing
+proxy:
+  grpc:
+    serverMaxRecvSize: 268435456  # 256MB
+    serverMaxSendSize: 268435456  # 256MB
+    clientMaxRecvSize: 268435456  # 256MB
+    clientMaxSendSize: 268435456  # 256MB

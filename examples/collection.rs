@@ -45,7 +45,7 @@ async fn hello_milvus(client: &Client, collection: &CollectionSchema) -> Result<
     let mut embed_data = Vec::<f32>::new();
     for _ in 1..=DIM * 1000 {
         let mut rng = rand::thread_rng();
-        let embed = rng.gen();
+        let embed = rng.r#gen();
         embed_data.push(embed);
     }
     let embed_column =

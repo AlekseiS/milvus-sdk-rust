@@ -99,7 +99,7 @@ pub fn gen_random_int64_vector(n: i64) -> Vec<i64> {
     let mut data: Vec<i64> = Vec::with_capacity(n as usize);
     let mut rng = rand::thread_rng();
     for _ in 0..n {
-        data.push(rng.gen());
+        data.push(rng.r#gen());
     }
     data
 }
@@ -112,7 +112,7 @@ pub fn gen_random_f32_vector_custom(n: i64, dimension: i64) -> Vec<f32> {
     let mut data = Vec::<f32>::with_capacity((n * dimension) as usize);
     let mut rng = rand::thread_rng();
     for _ in 0..n * dimension {
-        data.push(rng.gen());
+        data.push(rng.r#gen());
     }
     data
 }

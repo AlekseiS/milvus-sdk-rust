@@ -192,7 +192,9 @@ impl Client {
 
         let channel = tonic::transport::Endpoint::new(dst)?.connect().await?;
 
-        let client = MilvusServiceClient::with_interceptor(channel.clone(), combined_interceptor);
+        let client = MilvusServiceClient::with_interceptor(channel.clone(), combined_interceptor)
+            .max_decoding_message_size(256 * 1024 * 1024) // 256MB
+            .max_encoding_message_size(256 * 1024 * 1024); // 256MB
 
         Ok(Self {
             client: client.clone(),

@@ -76,7 +76,7 @@ async fn high_volume_search_and_query_under_load() -> Result<()> {
             let start_id = i * BATCH_SIZE;
             let ids: Vec<i64> = (start_id..start_id + BATCH_SIZE).collect();
             let vectors: Vec<f32> = (0..(BATCH_SIZE * DEFAULT_DIM))
-                .map(|_| rand::thread_rng().gen())
+                .map(|_| rand::thread_rng().r#gen())
                 .collect();
             let varchars: Vec<String> = (0..BATCH_SIZE)
                 .map(|k| format!("varchar_{}", start_id + k))
@@ -133,7 +133,7 @@ async fn high_volume_search_and_query_under_load() -> Result<()> {
         tasks.push(tokio::spawn(async move {
             while start_time.elapsed() < test_duration {
                 let query_vector: Vec<f32> =
-                    (0..DEFAULT_DIM).map(|_| rand::thread_rng().gen()).collect();
+                    (0..DEFAULT_DIM).map(|_| rand::thread_rng().r#gen()).collect();
                 let search_options = SearchOptions::new()
                     .limit(10)
                     .radius(1.0)
@@ -183,7 +183,7 @@ async fn high_volume_search_and_query_under_load() -> Result<()> {
                 let start_id = INITIAL_ENTITY_COUNT + (i as i64 * 1_000_000) + counter;
                 let ids = vec![start_id];
                 let vectors: Vec<f32> =
-                    (0..DEFAULT_DIM).map(|_| rand::thread_rng().gen()).collect();
+                    (0..DEFAULT_DIM).map(|_| rand::thread_rng().r#gen()).collect();
                 let varchars = vec![format!("churn_{}", start_id)];
                 let fields = vec![
                     FieldColumn::new(&id_schema_clone, ids.clone()),

@@ -75,7 +75,7 @@ async fn high_concurrency_crud_and_indexing() -> Result<()> {
                 let start_id = (i as i64 * TOTAL_INSERTS_PER_TASK) + (j * BATCH_SIZE);
                 let ids: Vec<i64> = (start_id..start_id + BATCH_SIZE).collect();
                 let vectors: Vec<f32> = (0..(BATCH_SIZE * DEFAULT_DIM))
-                    .map(|_| rand::thread_rng().gen())
+                    .map(|_| rand::thread_rng().r#gen())
                     .collect();
                 let varchars: Vec<String> = (0..BATCH_SIZE)
                     .map(|k| format!("varchar_{}", start_id + k))

@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut title_data = Vec::new();
 
     for i in 1..=6 {
-        embeddings_data.extend((0..DIM).map(|_| rng.gen::<f32>()));
+        embeddings_data.extend((0..DIM).map(|_| rng.r#gen::<f32>()));
         title_data.push(format!("t{}", i));
     }
 

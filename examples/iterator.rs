@@ -20,7 +20,7 @@ const NUM_ENTITIES: i64 = 10000;
 async fn test_search_iterator(client: &Client) -> Result<(), Error> {
     // Generate a random vector for search
     let mut rng = rand::thread_rng();
-    let search_vector: Vec<f32> = (0..DIM).map(|_| rng.gen()).collect();
+    let search_vector: Vec<f32> = (0..DIM).map(|_| rng.r#gen()).collect();
 
     // Create search iterator options
     let search_options = SearchIteratorOptions::new()
@@ -172,7 +172,7 @@ async fn main() -> Result<(), Error> {
         ages.push((i % 100) as i64);
         deposits.push(i as f64);
         for _ in 0..DIM {
-            pictures.push(rng.gen::<f32>());
+            pictures.push(rng.r#gen::<f32>());
         }
     }
 
