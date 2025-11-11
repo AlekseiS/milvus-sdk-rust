@@ -421,8 +421,8 @@ impl Default for QueryOptions {
             partition_names: Vec::new(),
             guarantee_timestamp: 0,
             query_params: vec![],
-            consistency_level: 0,
-            use_default_consistency: false,
+            consistency_level: 2,
+            use_default_consistency: true,
             expr_template_values: HashMap::new(),
         }
     }
@@ -1188,7 +1188,7 @@ impl Client {
                 consistency_level: if options.consistency_level > 0 {
                     options.consistency_level
                 } else {
-                    0
+                    2
                 },
                 use_default_consistency: options.use_default_consistency,
                 expr_template_values: options.expr_template_values.clone(),
@@ -1310,8 +1310,16 @@ impl Client {
                     .get_gts_from_consistency(&collection_name, collection.consistency_level)
                     .await,
                 not_return_all_meta: false,
-                consistency_level: ConsistencyLevel::default() as _,
-                use_default_consistency: false,
+                consistency_level: extract_param(&options.search_params, "consistency_level", "2")
+                    .parse()
+                    .unwrap_or(ConsistencyLevel::Bounded as _),
+                use_default_consistency: extract_param(
+                    &options.search_params,
+                    "use_default_consistency",
+                    "true",
+                )
+                .parse()
+                .unwrap_or(true),
                 search_by_primary_keys: false,
                 expr_template_values: options.expr_template_values.clone(),
                 sub_reqs: vec![],
@@ -1502,8 +1510,8 @@ impl Client {
                 nq: req.data.len() as i64,
                 not_return_all_meta: false,
                 consistency_level: {
-                    let level = extract_param(&search_params, "consistency_level", "0");
-                    level.parse().unwrap_or(ConsistencyLevel::default() as _)
+                    let level = extract_param(&search_params, "consistency_level", "2");
+                    level.parse().unwrap_or(ConsistencyLevel::Bounded as _)
                 },
                 use_default_consistency: extract_param(
                     &search_params,
@@ -1539,9 +1547,9 @@ impl Client {
                 .await,
             not_return_all_meta: false,
             output_fields: options.output_fields,
-            consistency_level: extract_param(&options.search_params, "consistency_level", "0")
+            consistency_level: extract_param(&options.search_params, "consistency_level", "2")
                 .parse()
-                .unwrap_or(ConsistencyLevel::default() as _),
+                .unwrap_or(ConsistencyLevel::Bounded as _),
             use_default_consistency: extract_param(
                 &options.search_params,
                 "use_default_consistency",
