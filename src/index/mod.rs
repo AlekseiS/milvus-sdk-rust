@@ -46,6 +46,8 @@ pub enum IndexType {
     Trie,
     #[strum(serialize = "BITMAP")]
     Bitmap,
+    #[strum(serialize = "SPARSE_INVERTED_INDEX")]
+    SparseInvertedIndex,
 }
 
 #[derive(Debug, Clone, Copy, EnumString, Display)]
@@ -57,6 +59,7 @@ pub enum MetricType {
     TANIMOTO,
     SUBSTRUCTURE,
     SUPERSTRUCTURE,
+    BM25,
 }
 
 #[derive(Debug, Clone)]
