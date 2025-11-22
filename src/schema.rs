@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::error;
+use crate::{error, proto::schema::FunctionSchema};
 use crate::error::Result;
 use crate::proto::schema::FieldState;
 use prost::alloc::vec::Vec;
@@ -522,6 +522,7 @@ pub struct CollectionSchema {
     pub(crate) description: String,
     pub(crate) fields: Vec<FieldSchema>,
     pub(crate) enable_dynamic_field: bool,
+    pub(crate) functions: Vec<FunctionSchema>,
 }
 
 impl CollectionSchema {
@@ -577,7 +578,7 @@ impl From<CollectionSchema> for schema::CollectionSchema {
             fields: col.fields.into_iter().map(Into::into).collect(),
             enable_dynamic_field: col.enable_dynamic_field,
             properties: Vec::new(),
-            functions: Vec::new(),
+            functions: col.functions,
             db_name: "".to_string(),
             struct_array_fields: Vec::new(),
         }
@@ -591,6 +592,7 @@ impl From<schema::CollectionSchema> for CollectionSchema {
             name: v.name,
             description: v.description,
             enable_dynamic_field: v.enable_dynamic_field,
+            functions: v.functions,
         }
     }
 }
@@ -601,6 +603,7 @@ pub struct CollectionSchemaBuilder {
     description: String,
     inner: Vec<FieldSchema>,
     enable_dynamic_field: bool,
+    functions: Vec<FunctionSchema>,
 }
 
 impl CollectionSchemaBuilder {
@@ -610,6 +613,7 @@ impl CollectionSchemaBuilder {
             description: description.to_owned(),
             inner: Vec::new(),
             enable_dynamic_field: false,
+            functions: Vec::new(),
         }
     }
 
@@ -670,6 +674,44 @@ impl CollectionSchemaBuilder {
         self
     }
 
+    /// Add a BM25 function for full-text search
+    ///
+    /// This method automatically marks the output field as a function output field.
+    ///
+    /// # Arguments
+    /// * `function_name` - Name of the BM25 function
+    /// * `input_field` - Name of the VARCHAR field with enable_analyzer=true
+    /// * `output_field` - Name of the SPARSE_FLOAT_VECTOR field to store results
+    pub fn add_bm25_function(
+        &mut self,
+        function_name: &str,
+        input_field: &str,
+        output_field: &str,
+    ) -> &mut Self {
+        use crate::proto::schema::FunctionType;
+
+        let function = FunctionSchema {
+            name: function_name.to_string(),
+            id: 0,
+            description: "BM25 function for full-text search".to_string(),
+            r#type: FunctionType::Bm25 as i32,
+            input_field_names: vec![input_field.to_string()],
+            output_field_names: vec![output_field.to_string()],
+            input_field_ids: Vec::new(),
+            output_field_ids: Vec::new(),
+            params: Vec::new(),
+        };
+
+        self.functions.push(function);
+
+        // Automatically mark the output field as function output (matches pymilvus behavior)
+        if let Some(field) = self.inner.iter_mut().find(|f| f.name == output_field) {
+            field.is_function_output = true;
+        }
+
+        self
+    }
+
     pub fn build(&mut self) -> Result<CollectionSchema> {
         let mut has_primary = false;
 
@@ -691,6 +733,7 @@ impl CollectionSchemaBuilder {
             name: this.name,
             description: this.description,
             enable_dynamic_field: self.enable_dynamic_field,
+            functions: this.functions,
         })
     }
 }
