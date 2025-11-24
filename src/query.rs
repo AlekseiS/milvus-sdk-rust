@@ -1341,13 +1341,13 @@ impl Client {
             .collect::<Vec<FieldColumn>>();
 
         // Handle case where no IDs are returned (empty search results)
-        let raw_id = raw_data
-            .ids
-            .ok_or(SuperError::Unexpected("no IDs in search result".to_owned()))?
-            .id_field
-            .ok_or(SuperError::Unexpected(
-                "no ID field in search result".to_owned(),
-            ))?;
+        // When there are no results, Milvus may return None for ids
+        let Some(ids) = raw_data.ids else {
+            return Ok(vec![]);
+        };
+        let Some(raw_id) = ids.id_field else {
+            return Ok(vec![]);
+        };
 
         for k in raw_data.topks {
             let k = k as usize;
@@ -1583,15 +1583,13 @@ impl Client {
             .collect::<Vec<FieldColumn>>();
 
         // Handle case where no IDs are returned (empty search results)
-        let raw_id = raw_data
-            .ids
-            .ok_or(SuperError::Unexpected(
-                "no IDs in hybrid search result".to_owned(),
-            ))?
-            .id_field
-            .ok_or(SuperError::Unexpected(
-                "no ID field in hybrid search result".to_owned(),
-            ))?;
+        // When there are no results, Milvus may return None for ids
+        let Some(ids) = raw_data.ids else {
+            return Ok(vec![]);
+        };
+        let Some(raw_id) = ids.id_field else {
+            return Ok(vec![]);
+        };
 
         for k in raw_data.topks {
             let k = k as usize;
