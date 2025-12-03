@@ -35,8 +35,8 @@
 
 use std::collections::HashMap;
 
-use prost::bytes::BytesMut;
 use prost::Message;
+use prost::bytes::BytesMut;
 
 use crate::client::{Client, ConsistencyLevel};
 use crate::collection::{Collection, SearchResult};
@@ -1775,7 +1775,7 @@ pub fn get_place_holder_group(vectors: &Vec<Value>) -> Result<Vec<u8>> {
 /// Converts vector data to placeholder value format
 ///
 /// This function creates a PlaceholderValue from vector data, handling
-/// both float and binary vector types.
+/// float, binary, sparse, and text vector types.
 ///
 /// # Arguments
 ///
@@ -1803,11 +1803,19 @@ fn get_place_holder_value(vectors: &Vec<Value>) -> Result<PlaceholderValue> {
         Value::FloatArray(_) => place_holder.r#type = PlaceholderType::FloatVector as _,
         Value::Binary(_) => place_holder.r#type = PlaceholderType::BinaryVector as _,
         Value::String(_) => place_holder.r#type = PlaceholderType::VarChar as _,
+        Value::SparseFloatVector(_) => {
+            place_holder.r#type = PlaceholderType::SparseFloatVector as _
+        }
         _ => {
             return Err(SuperError::from(crate::collection::Error::IllegalType(
                 "place holder".to_string(),
-                vec![DataType::BinaryVector, DataType::FloatVector, DataType::VarChar],
-            )))
+                vec![
+                    DataType::BinaryVector,
+                    DataType::FloatVector,
+                    DataType::VarChar,
+                    DataType::SparseFloatVector,
+                ],
+            )));
         }
     };
 
@@ -1825,11 +1833,22 @@ fn get_place_holder_value(vectors: &Vec<Value>) -> Result<PlaceholderValue> {
                 // Encode string as UTF-8 bytes for BM25 full-text search
                 place_holder.values.push(s.as_bytes().to_vec())
             }
+            (Value::SparseFloatVector(d), Value::SparseFloatVector(_)) => {
+                use crate::sparse::sparse_row_to_bytes;
+                let mut row: Vec<(u32, f32)> = d.to_vec();
+                let bytes = sparse_row_to_bytes(&mut row);
+                place_holder.values.push(bytes)
+            }
             _ => {
                 return Err(SuperError::from(crate::collection::Error::IllegalType(
                     "place holder".to_string(),
-                    vec![DataType::BinaryVector, DataType::FloatVector, DataType::VarChar],
-                )))
+                    vec![
+                        DataType::BinaryVector,
+                        DataType::FloatVector,
+                        DataType::VarChar,
+                        DataType::SparseFloatVector,
+                    ],
+                )));
             }
         };
     }

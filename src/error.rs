@@ -21,8 +21,8 @@ use crate::proto::common::{ErrorCode, Status};
 use crate::schema::Error as SchemaError;
 use std::result;
 use thiserror::Error;
-use tonic::transport::Error as CommError;
 use tonic::Status as GrpcError;
+use tonic::transport::Error as CommError;
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -69,6 +69,9 @@ pub enum Error {
 
     #[error("{0:?}")]
     ParseInt(#[from] std::num::ParseIntError),
+
+    #[error("Sparse vector error: {0}")]
+    SparseVectorError(String),
 }
 
 impl From<Status> for Error {

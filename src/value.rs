@@ -3,8 +3,8 @@ use std::borrow::Cow;
 use crate::proto::{
     self,
     schema::{
-        field_data::Field, scalar_field::Data as ScalarData, vector_field::Data as VectorData,
-        DataType,
+        DataType, field_data::Field, scalar_field::Data as ScalarData,
+        vector_field::Data as VectorData,
     },
 };
 
@@ -25,6 +25,7 @@ pub enum Value<'a> {
     Array(Cow<'a, proto::schema::ScalarField>),
     StructArray(Cow<'a, proto::schema::StructArrayField>),
     VectorArray(Cow<'a, proto::schema::VectorArray>),
+    SparseFloatVector(Cow<'a, [(u32, f32)]>),
 }
 
 macro_rules! impl_from_for_field_data_column {
@@ -65,6 +66,7 @@ impl Value<'_> {
             Value::Array(_) => DataType::Array,
             Value::StructArray(_) => DataType::ArrayOfStruct,
             Value::VectorArray(_) => DataType::ArrayOfVector,
+            Value::SparseFloatVector(_) => DataType::SparseFloatVector,
         }
     }
 
@@ -86,6 +88,7 @@ impl Value<'_> {
             Value::Array(cow) => Value::Array(Cow::Owned(cow.into_owned())),
             Value::StructArray(cow) => Value::StructArray(Cow::Owned(cow.into_owned())),
             Value::VectorArray(cow) => Value::VectorArray(Cow::Owned(cow.into_owned())),
+            Value::SparseFloatVector(cow) => Value::SparseFloatVector(Cow::Owned(cow.into_owned())),
         }
     }
 }
@@ -126,6 +129,18 @@ impl From<Vec<f32>> for Value<'static> {
     }
 }
 
+impl<'a> From<&'a [(u32, f32)]> for Value<'a> {
+    fn from(v: &'a [(u32, f32)]) -> Self {
+        Self::SparseFloatVector(Cow::Borrowed(v))
+    }
+}
+
+impl From<Vec<(u32, f32)>> for Value<'static> {
+    fn from(v: Vec<(u32, f32)>) -> Self {
+        Self::SparseFloatVector(Cow::Owned(v))
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum ValueVec {
     None,
@@ -138,6 +153,7 @@ pub enum ValueVec {
     String(Vec<String>),
     Json(Vec<Vec<u8>>),
     Array(Vec<proto::schema::ScalarField>),
+    SparseFloatVector(Vec<Vec<(u32, f32)>>),
 }
 
 macro_rules! impl_from_for_value_vec {
@@ -158,6 +174,12 @@ impl_from_for_value_vec! {
     Vec<u8>, Binary,
     Vec<f32>, Float,
     Vec<f64>, Double
+}
+
+impl From<Vec<Vec<(u32, f32)>>> for ValueVec {
+    fn from(v: Vec<Vec<(u32, f32)>>) -> Self {
+        Self::SparseFloatVector(v)
+    }
 }
 
 macro_rules! impl_try_from_for_value_vec {
@@ -217,7 +239,7 @@ impl ValueVec {
             DataType::Float16Vector => Self::Binary(Vec::new()),
             DataType::BFloat16Vector => Self::Binary(Vec::new()),
             DataType::Geometry => unimplemented!(),
-            DataType::SparseFloatVector => unimplemented!(),
+            DataType::SparseFloatVector => Self::SparseFloatVector(Vec::new()),
             _ => unimplemented!(),
         }
     }
@@ -235,7 +257,8 @@ impl ValueVec {
             | (ValueVec::String(..), DataType::String)
             | (ValueVec::String(..), DataType::VarChar)
             | (ValueVec::None, _)
-            | (ValueVec::Double(..), DataType::Double) => true,
+            | (ValueVec::Double(..), DataType::Double)
+            | (ValueVec::SparseFloatVector(..), DataType::SparseFloatVector) => true,
             _ => false,
         }
     }
@@ -257,6 +280,7 @@ impl ValueVec {
             ValueVec::String(v) => v.len(),
             ValueVec::Json(v) => v.len(),
             ValueVec::Array(v) => v.len(),
+            ValueVec::SparseFloatVector(v) => v.len(),
         }
     }
 
@@ -272,6 +296,7 @@ impl ValueVec {
             ValueVec::String(v) => v.clear(),
             ValueVec::Json(v) => v.clear(),
             ValueVec::Array(v) => v.clear(),
+            ValueVec::SparseFloatVector(v) => v.clear(),
         }
     }
 }
@@ -301,7 +326,12 @@ impl From<Field> for ValueVec {
                     VectorData::BinaryVector(v) => Self::Binary(v),
                     VectorData::Bfloat16Vector(v) => Self::Binary(v),
                     VectorData::Float16Vector(v) => Self::Binary(v),
-                    VectorData::SparseFloatVector(_) => Self::Float(Vec::new()),
+                    VectorData::SparseFloatVector(sparse_array) => {
+                        use crate::sparse::sparse_proto_to_vectors;
+                        // Parse the sparse vectors, return empty vec on error
+                        let vectors = sparse_proto_to_vectors(&sparse_array).unwrap_or_default();
+                        Self::SparseFloatVector(vectors)
+                    }
                     VectorData::Int8Vector(_) => unimplemented!(),
                     VectorData::VectorArray(_) => unimplemented!(),
                 },

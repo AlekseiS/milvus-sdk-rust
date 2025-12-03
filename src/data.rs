@@ -2,8 +2,8 @@ use std::borrow::Cow;
 
 use crate::{
     proto::schema::{
-        self, field_data::Field, scalar_field::Data as ScalarData,
-        vector_field::Data as VectorData, DataType, ScalarField, VectorField,
+        self, DataType, ScalarField, VectorField, field_data::Field,
+        scalar_field::Data as ScalarData, vector_field::Data as VectorData,
     },
     schema::FieldSchema,
     value::{Value, ValueVec},
@@ -37,6 +37,18 @@ impl_has_data_type! {
     Vec<u8>, DataType::BinaryVector,
     Cow<'_, [f32]>, DataType::FloatVector,
     Cow<'_, [u8]>, DataType::BinaryVector
+}
+
+impl HasDataType for Vec<(u32, f32)> {
+    fn data_type() -> DataType {
+        DataType::SparseFloatVector
+    }
+}
+
+impl HasDataType for Vec<Vec<(u32, f32)>> {
+    fn data_type() -> DataType {
+        DataType::SparseFloatVector
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -110,6 +122,9 @@ impl FieldColumn {
             ValueVec::String(v) => Value::String(Cow::Borrowed(v.get(idx)?.as_ref())),
             ValueVec::Json(v) => Value::Json(Cow::Borrowed(v.get(idx)?.as_ref())),
             ValueVec::Array(v) => Value::Array(Cow::Borrowed(v.get(idx)?)),
+            ValueVec::SparseFloatVector(v) => {
+                Value::SparseFloatVector(Cow::Borrowed(v.get(idx)?.as_slice()))
+            }
         })
     }
 
@@ -126,6 +141,7 @@ impl FieldColumn {
             (ValueVec::String(vec), Value::String(i)) => vec.push(i.to_string()),
             (ValueVec::Binary(vec), Value::Binary(i)) => vec.extend_from_slice(i.as_ref()),
             (ValueVec::Float(vec), Value::FloatArray(i)) => vec.extend_from_slice(i.as_ref()),
+            (ValueVec::SparseFloatVector(vec), Value::SparseFloatVector(i)) => vec.push(i.to_vec()),
             _ => panic!("column type mismatch"),
         }
     }
@@ -152,6 +168,7 @@ impl FieldColumn {
                 ValueVec::Json(_) => ValueVec::Json(Vec::new()),
                 ValueVec::Binary(_) => ValueVec::Binary(Vec::new()),
                 ValueVec::Array(_) => ValueVec::Array(Vec::new()),
+                ValueVec::SparseFloatVector(_) => ValueVec::SparseFloatVector(Vec::new()),
             },
             is_dynamic: self.is_dynamic,
         }
@@ -205,6 +222,13 @@ impl From<FieldColumn> for schema::FieldData {
                     data: Some(VectorData::BinaryVector(v)),
                     dim: this.dim,
                 }),
+                ValueVec::SparseFloatVector(v) => {
+                    use crate::sparse::sparse_vectors_to_proto;
+                    Field::Vectors(VectorField {
+                        data: Some(VectorData::SparseFloatVector(sparse_vectors_to_proto(v))),
+                        dim: this.dim,
+                    })
+                }
             }),
             is_dynamic: false,
         }

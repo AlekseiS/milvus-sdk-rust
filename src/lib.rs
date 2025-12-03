@@ -27,6 +27,7 @@ pub mod partition;
 pub mod query;
 pub mod resource_group;
 pub mod schema;
+pub mod sparse;
 pub mod value;
 
 mod config;
@@ -34,3 +35,6 @@ pub mod index;
 pub mod proto;
 pub mod types;
 mod utils;
+
+// Re-export commonly used types
+pub use sparse::SparseVector;

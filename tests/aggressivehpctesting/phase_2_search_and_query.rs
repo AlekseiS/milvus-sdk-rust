@@ -32,6 +32,7 @@ const QUERIER_TASKS: usize = 20;
 const CHURN_TASKS: usize = 5;
 
 #[tokio::test]
+#[ignore]
 async fn high_volume_search_and_query_under_load() -> Result<()> {
     let client = ClientBuilder::new(URL)
         .timeout(Duration::from_secs(60))

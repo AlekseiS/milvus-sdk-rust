@@ -1044,6 +1044,11 @@ impl QueryIterator {
                                     *v = v[..min_len].to_vec();
                                 }
                             }
+                            ValueVec::SparseFloatVector(v) => {
+                                if v.len() >= min_len {
+                                    *v = v[..min_len].to_vec();
+                                }
+                            }
                         }
                         new_field
                     })
