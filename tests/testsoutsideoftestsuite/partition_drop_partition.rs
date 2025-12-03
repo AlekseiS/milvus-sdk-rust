@@ -11,6 +11,20 @@ async fn test_drop_partition() {
         .create_partition(collection.name().to_string(), "test_partition".to_string())
         .await
         .unwrap();
+
+    // Release the partition before dropping it
+    let release_result = client
+        .release_partitions(
+            collection.name().to_string(),
+            vec!["test_partition".to_string()],
+        )
+        .await;
+    assert!(
+        release_result.is_ok(),
+        "Failed to release partition: {:?}",
+        release_result
+    );
+
     let result = client
         .drop_partition(collection.name().to_string(), "test_partition".to_string())
         .await;

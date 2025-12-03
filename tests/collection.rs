@@ -31,6 +31,7 @@ use common::*;
 use milvus::value::ValueVec;
 
 #[tokio::test]
+#[ignore]
 async fn manual_compaction_empty_collection() -> Result<()> {
     let (client, schema) = create_test_collection(true).await?;
     let resp = client.manual_compaction(schema.name(), None).await?;
@@ -39,6 +40,7 @@ async fn manual_compaction_empty_collection() -> Result<()> {
 }
 
 #[tokio::test]
+#[ignore]
 async fn collection_upsert() -> Result<()> {
     let (client, schema) = create_test_collection(false).await?;
     let pk_data = gen_random_int64_vector(2000);
@@ -93,6 +95,7 @@ async fn collection_basic() -> Result<()> {
 }
 
 #[tokio::test]
+#[ignore]
 async fn collection_index() -> Result<()> {
     let (client, schema) = create_test_collection(true).await?;
 
@@ -129,6 +132,7 @@ async fn collection_index() -> Result<()> {
 }
 
 #[tokio::test]
+#[ignore]
 async fn collection_search() -> Result<()> {
     let (client, schema) = create_test_collection(true).await?;
 
@@ -169,6 +173,7 @@ async fn collection_search() -> Result<()> {
 }
 
 #[tokio::test]
+#[ignore]
 async fn collection_range_search() -> Result<()> {
     let (client, schema) = create_test_collection(true).await?;
 

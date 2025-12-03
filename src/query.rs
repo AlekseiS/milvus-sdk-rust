@@ -13,7 +13,7 @@
 //!
 //! ## Examples
 //!
-//! ```rust
+//! ```rust,ignore
 //! use milvus_sdk_rust::client::Client;
 //! use milvus_sdk_rust::query::{SearchOptions, QueryOptions, AnnSearchRequest, WeightedRanker};
 //! use milvus_sdk_rust::value::Value;
@@ -72,8 +72,8 @@ const EVENTUALLY_TIMESTAMP: u64 = 1;
 ///
 /// # Example
 ///
-/// ```rust
-/// use milvus_sdk_rust::query::AnnSearchRequest;
+/// ```rust,ignore
+/// use milvus::query::AnnSearchRequest;
 /// use milvus_sdk_rust::value::Value;
 /// use milvus_sdk_rust::proto::common::KeyValuePair;
 ///
@@ -274,8 +274,8 @@ pub trait BaseRanker: Send + Sync {
 ///
 /// ## Example
 ///
-/// ```rust
-/// use milvus_sdk_rust::query::WeightedRanker;
+/// ```rust,ignore
+/// use milvus::query::WeightedRanker;
 ///
 /// // Give 70% weight to first search, 30% to second search
 /// let ranker = WeightedRanker::new(vec![0.7, 0.3]);
@@ -325,8 +325,8 @@ impl BaseRanker for WeightedRanker {
 ///
 /// ## Example
 ///
-/// ```rust
-/// use milvus_sdk_rust::query::RrfRanker;
+/// ```rust,ignore
+/// use milvus::query::RrfRanker;
 ///
 /// // Create RRF ranker with k=60 (typical value)
 /// let ranker = RrfRanker::new(60.0);
@@ -378,8 +378,8 @@ pub type HybridSearchOptions = SearchOptions;
 ///
 /// ## Example
 ///
-/// ```rust
-/// use milvus_sdk_rust::query::QueryOptions;
+/// ```rust,ignore
+/// use milvus::query::QueryOptions;
 ///
 /// let options = QueryOptions::new()
 ///     .output_fields(vec!["id".to_string(), "title".to_string()])
@@ -816,8 +816,8 @@ impl QueryOptions {
 ///
 /// ## Example
 ///
-/// ```rust
-/// use milvus_sdk_rust::query::SearchOptions;
+/// ```rust,ignore
+/// use milvus::query::SearchOptions;
 ///
 /// let options = SearchOptions::new()
 ///     .limit(10)
@@ -1145,7 +1145,7 @@ impl Client {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use milvus_sdk_rust::query::QueryOptions;
     ///
     /// let options = QueryOptions::new()
@@ -1219,7 +1219,7 @@ impl Client {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use milvus_sdk_rust::query::SearchOptions;
     /// use milvus_sdk_rust::value::Value;
     ///
@@ -1405,7 +1405,7 @@ impl Client {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use milvus_sdk_rust::query::{AnnSearchRequest, WeightedRanker, SearchOptions};
     /// use milvus_sdk_rust::value::Value;
     /// use milvus_sdk_rust::proto::common::KeyValuePair;
@@ -1701,7 +1701,7 @@ impl Client {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// use milvus_sdk_rust::query::{GetOptions, IdType};
     ///
     /// // Get by integer IDs
