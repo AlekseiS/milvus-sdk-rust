@@ -74,6 +74,24 @@ impl DeleteOptions {
     }
 }
 
+/// Append a quoted string value to the expression, escaping special characters.
+fn append_quoted_string(expr: &mut String, value: &str) {
+    expr.push('"');
+    // Fast path: no escaping needed (common case for IDs)
+    if !value.contains('\\') && !value.contains('"') {
+        expr.push_str(value);
+    } else {
+        for c in value.chars() {
+            match c {
+                '\\' => expr.push_str("\\\\"),
+                '"' => expr.push_str("\\\""),
+                _ => expr.push(c),
+            }
+        }
+    }
+    expr.push('"');
+}
+
 impl Client {
     pub async fn insert<S>(
         &self,
@@ -166,11 +184,11 @@ impl Client {
                     (DataType::VarChar, ValueVec::String(values)) => {
                         for (i, v) in values.iter().enumerate() {
                             if i > 0 {
-                                expr.push_str(",");
+                                expr.push(',');
                             }
-                            expr.push_str(v.as_str());
+                            append_quoted_string(&mut expr, v);
                         }
-                        expr.push_str("]");
+                        expr.push(']');
                         expr
                     }
 
